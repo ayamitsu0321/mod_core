@@ -35,7 +35,9 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.FMLInjectionData;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 
+@TransformerExclusions("ayamitsu.util.asm")
 public final class ASMDebugUtils implements Opcodes {
 
 	private static final ASMDebugUtils SINGLETON = new ASMDebugUtils();
@@ -108,7 +110,7 @@ public final class ASMDebugUtils implements Opcodes {
 	}
 
 	public static void log(FieldNode fNode) {
-		logger.fine((new DebugStringBuilder().appendClass(fNode).appendName(fNode.name).appendDesc(fNode.desc).appendSignature(fNode.signature).trim()).toString());
+		logger.fine((new DebugStringBuilder().appendClass(fNode).appendName(fNode.name).appendDesc(fNode.desc).appendValue(fNode.value).appendSignature(fNode.signature).trim()).toString());
 	}
 
 	public static void log(MethodNode mNode) {
@@ -252,6 +254,11 @@ public final class ASMDebugUtils implements Opcodes {
 
 		public DebugStringBuilder appendOpcode(int opcode) {
 			this.instance.append("opcode:" + Integer.toHexString(opcode) + "(" + ASMDebugUtils.translateOpcode(opcode) + ")" + ", ");
+			return this;
+		}
+
+		public DebugStringBuilder appendValue(Object obj) {
+			this.instance.append("value:" + String.valueOf(obj) + ", ");
 			return this;
 		}
 

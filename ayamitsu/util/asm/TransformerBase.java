@@ -33,14 +33,14 @@ public abstract class TransformerBase implements IClassTransformer, Opcodes {
 
 	protected abstract byte[] transformTarget(String name, String transformedName, byte[] arrayOfByte);
 
-	protected ClassNode encode(byte[] arrayOfByte) {
+	protected final ClassNode encode(byte[] arrayOfByte) {
 		ClassNode cNode = new ClassNode();
 		ClassReader cReader = new ClassReader(arrayOfByte);
 		cReader.accept(cNode, 0);
 		return cNode;
 	}
 
-	protected byte[] decode(ClassNode cNode) {
+	protected final byte[] decode(ClassNode cNode) {
 		ClassWriter cWriter = new ClassWriter(ClassWriter.COMPUTE_FRAMES | ClassWriter.COMPUTE_MAXS)
 		{
 			@Override
