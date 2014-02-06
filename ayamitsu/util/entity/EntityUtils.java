@@ -49,7 +49,7 @@ public final class EntityUtils
 	{
 		try
 		{
-			Field field = EntityList.class.getDeclaredFields()[0];
+			Field field = EntityList.class.getDeclaredFields()[1];
 			field.setAccessible(true);
 			return (Map)field.get(null);
 		}
@@ -63,7 +63,7 @@ public final class EntityUtils
 	{
 		try
 		{
-			Field field = EntityList.class.getDeclaredFields()[1];
+			Field field = EntityList.class.getDeclaredFields()[2];
 			field.setAccessible(true);
 			return (Map)field.get(null);
 		}

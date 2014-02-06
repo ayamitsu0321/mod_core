@@ -1,340 +1,343 @@
 package ayamitsu.util.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
 public abstract class AbstractInventory implements IInventory {
-	public ItemStack[] items;
-	private String name;
-	private int stackLimit;
 
-	public AbstractInventory(int capacity, String str) {
-		this(capacity, str, 64);
-	}
+    public ItemStack[] items;
+    private String name;
+    private int stackLimit;
 
-	public AbstractInventory(int capacity, String str, int stack) {
-		this.items = new ItemStack[capacity];
-		this.name = str;
-		this.stackLimit = stack;
-	}
+    public AbstractInventory(int capacity, String str) {
+        this(capacity, str, 64);
+    }
 
-	private int getInventorySlotContainItem(int id) {
-		for (int i = 0; i < this.items.length; ++i) {
-			if (this.items[i] != null && this.items[i].itemID == id) {
-				return i;
-			}
-		}
+    public AbstractInventory(int capacity, String str, int stack) {
+        this.items = new ItemStack[capacity];
+        this.name = str;
+        this.stackLimit = stack;
+    }
 
-		return -1;
-	}
+    private int getInventorySlotContainItem(Item item) {
+        for (int i = 0; i < this.items.length; ++i) {
+            if (this.items[i] != null && this.items[i].getItem() == item) {
+                return i;
+            }
+        }
 
-	private int getInventorySlotContainItemAndDamage(int id, int damage) {
-		for (int i = 0; i < this.items.length; i++) {
-			if (this.items[i] != null && this.items[i].itemID == id
-					&& this.items[i].getItemDamage() == damage) {
-				return i;
-			}
-		}
+        return -1;
+    }
 
-		return -1;
-	}
+    private int getInventorySlotContainItemAndDamage(Item item, int damage) {
+        for (int i = 0; i < this.items.length; i++) {
+            if (this.items[i] != null && this.items[i].getItem() == item && this.items[i].getItemDamage() == damage) {
+                return i;
+            }
+        }
 
-	private int storeItemStack(ItemStack par1ItemStack) {
-		for (int var2 = 0; var2 < this.items.length; ++var2) {
-			if (this.items[var2] != null
-					&& this.items[var2].itemID == par1ItemStack.itemID
-					&& this.items[var2].isStackable()
-					&& this.items[var2].stackSize < this.items[var2]
-							.getMaxStackSize()
-					&& this.items[var2].stackSize < this
-							.getInventoryStackLimit()
-					&& (!this.items[var2].getHasSubtypes() || this.items[var2]
-							.getItemDamage() == par1ItemStack.getItemDamage())
-					&& ItemStack.areItemStackTagsEqual(this.items[var2],
-							par1ItemStack)) {
-				return var2;
-			}
-		}
+        return -1;
+    }
 
-		return -1;
-	}
+    private int storeItemStack(ItemStack par1ItemStack) {
+        for (int var2 = 0; var2 < this.items.length; ++var2) {
+            if (this.items[var2] != null
+                    && this.items[var2].getItem() == par1ItemStack.getItem()
+                    && this.items[var2].isStackable()
+                    && this.items[var2].stackSize < this.items[var2]
+                    .getMaxStackSize()
+                    && this.items[var2].stackSize < this
+                    .getInventoryStackLimit()
+                    && (!this.items[var2].getHasSubtypes() || this.items[var2]
+                    .getItemDamage() == par1ItemStack.getItemDamage())
+                    && ItemStack.areItemStackTagsEqual(this.items[var2],
+                    par1ItemStack)) {
+                return var2;
+            }
+        }
 
-	public int getFirstEmptyStack() {
-		for (int i = 0; i < this.items.length; ++i) {
-			if (this.items[i] == null) {
-				return i;
-			}
-		}
+        return -1;
+    }
 
-		return -1;
-	}
+    public int getFirstEmptyStack() {
+        for (int i = 0; i < this.items.length; ++i) {
+            if (this.items[i] == null) {
+                return i;
+            }
+        }
 
-	public boolean hasSomeItemStack() {
-		for (int i = 0; i < this.items.length; ++i) {
-			if (this.items[i] != null) {
-				return true;
-			}
-		}
+        return -1;
+    }
 
-		return false;
-	}
+    public boolean hasSomeItemStack() {
+        for (int i = 0; i < this.items.length; ++i) {
+            if (this.items[i] != null) {
+                return true;
+            }
+        }
 
-	/**
-	 * if id == -1 && damage == -1, clear all items
-	 */
-	public int clearInventory(int id, int damage) {
-		int count = 0;
+        return false;
+    }
 
-		for (int i = 0; i < this.items.length; ++i) {
-			ItemStack itemStack = this.items[i];
+    /**
+     * if id == -1 && damage == -1, clear all items
+     */
+    public int clearInventory(Item item, int damage) {
+        int count = 0;
 
-			if (itemStack != null && (id <= -1 || itemStack.itemID == id)
-					&& (damage <= -1 && itemStack.getItemDamage() == damage)) {
-				count += itemStack.stackSize;
-				this.items[i] = null;
-			}
-		}
+        for (int i = 0; i < this.items.length; ++i) {
+            ItemStack itemStack = this.items[i];
 
-		return count;
-	}
+            if (itemStack != null && (item == null || itemStack.getItem() == item)
+                    && (damage <= -1 && itemStack.getItemDamage() == damage)) {
+                count += itemStack.stackSize;
+                this.items[i] = null;
+            }
+        }
 
-	private int storePartialItemStack(ItemStack par1ItemStack) {
-		int var2 = par1ItemStack.itemID;
-		int var3 = par1ItemStack.stackSize;
-		int var4;
+        return count;
+    }
 
-		if (par1ItemStack.getMaxStackSize() == 1) {
-			var4 = this.getFirstEmptyStack();
+    private int storePartialItemStack(ItemStack par1ItemStack) {
+        //int var2 = par1ItemStack.itemID;
+        int var3 = par1ItemStack.stackSize;
+        int var4;
 
-			if (var4 < 0) {
-				return var3;
-			} else {
-				if (this.items[var4] == null) {
-					this.items[var4] = ItemStack.copyItemStack(par1ItemStack);
-				}
+        if (par1ItemStack.getMaxStackSize() == 1) {
+            var4 = this.getFirstEmptyStack();
 
-				return 0;
-			}
-		} else {
-			var4 = this.storeItemStack(par1ItemStack);
+            if (var4 < 0) {
+                return var3;
+            } else {
+                if (this.items[var4] == null) {
+                    this.items[var4] = ItemStack.copyItemStack(par1ItemStack);
+                }
 
-			if (var4 < 0) {
-				var4 = this.getFirstEmptyStack();
-			}
+                return 0;
+            }
+        } else {
+            var4 = this.storeItemStack(par1ItemStack);
 
-			if (var4 < 0) {
-				return var3;
-			} else {
-				if (this.items[var4] == null) {
-					this.items[var4] = new ItemStack(var2, 0,
-							par1ItemStack.getItemDamage());
+            if (var4 < 0) {
+                var4 = this.getFirstEmptyStack();
+            }
 
-					if (par1ItemStack.hasTagCompound()) {
-						this.items[var4]
-								.setTagCompound((NBTTagCompound) par1ItemStack
-										.getTagCompound().copy());
-					}
-				}
+            if (var4 < 0) {
+                return var3;
+            } else {
+                if (this.items[var4] == null) {
+                    this.items[var4] = new ItemStack(par1ItemStack.getItem(), 0, par1ItemStack.getItemDamage());
 
-				int var5 = var3;
+                    if (par1ItemStack.hasTagCompound()) {
+                        this.items[var4]
+                                .setTagCompound((NBTTagCompound) par1ItemStack
+                                        .getTagCompound().copy());
+                    }
+                }
 
-				if (var3 > this.items[var4].getMaxStackSize()
-						- this.items[var4].stackSize) {
-					var5 = this.items[var4].getMaxStackSize()
-							- this.items[var4].stackSize;
-				}
+                int var5 = var3;
 
-				if (var5 > this.getInventoryStackLimit()
-						- this.items[var4].stackSize) {
-					var5 = this.getInventoryStackLimit()
-							- this.items[var4].stackSize;
-				}
+                if (var3 > this.items[var4].getMaxStackSize()
+                        - this.items[var4].stackSize) {
+                    var5 = this.items[var4].getMaxStackSize()
+                            - this.items[var4].stackSize;
+                }
 
-				if (var5 == 0) {
-					return var3;
-				} else {
-					var3 -= var5;
-					this.items[var4].stackSize += var5;
-					this.items[var4].animationsToGo = 5;
-					return var3;
-				}
-			}
-		}
-	}
+                if (var5 > this.getInventoryStackLimit()
+                        - this.items[var4].stackSize) {
+                    var5 = this.getInventoryStackLimit()
+                            - this.items[var4].stackSize;
+                }
 
-	public boolean consumeInventoryItem(int id) {
-		int location = this.getInventorySlotContainItem(id);
+                if (var5 == 0) {
+                    return var3;
+                } else {
+                    var3 -= var5;
+                    this.items[var4].stackSize += var5;
+                    this.items[var4].animationsToGo = 5;
+                    return var3;
+                }
+            }
+        }
+    }
 
-		if (location < 0) {
-			return false;
-		} else {
-			if (--this.items[location].stackSize <= 0) {
-				this.items[location] = null;
-			}
+    public boolean consumeInventoryItem(Item item) {
+        int location = this.getInventorySlotContainItem(item);
 
-			return true;
-		}
-	}
+        if (location < 0) {
+            return false;
+        } else {
+            if (--this.items[location].stackSize <= 0) {
+                this.items[location] = null;
+            }
 
-	public boolean hasItem(int id) {
-		return this.getInventorySlotContainItem(id) >= 0;
-	}
+            return true;
+        }
+    }
 
-	public boolean addItemStackToInventory(ItemStack par1ItemStack) {
-		int var2;
+    public boolean hasItem(Item item) {
+        return this.getInventorySlotContainItem(item) >= 0;
+    }
 
-		if (par1ItemStack.isItemDamaged()) {
-			var2 = this.getFirstEmptyStack();
+    public boolean addItemStackToInventory(ItemStack par1ItemStack) {
+        int var2;
 
-			if (var2 >= 0) {
-				this.items[var2] = ItemStack.copyItemStack(par1ItemStack);
-				this.items[var2].animationsToGo = 5;
-				par1ItemStack.stackSize = 0;
-				return true;
-			}
-			/*
+        if (par1ItemStack.isItemDamaged()) {
+            var2 = this.getFirstEmptyStack();
+
+            if (var2 >= 0) {
+                this.items[var2] = ItemStack.copyItemStack(par1ItemStack);
+                this.items[var2].animationsToGo = 5;
+                par1ItemStack.stackSize = 0;
+                return true;
+            }
+            /*
 			 * else if (this.player.capabilities.isCreativeMode) {
 			 * par1ItemStack.stackSize = 0; return true; }
 			 */
-			else {
-				return false;
-			}
-		} else {
-			do {
-				var2 = par1ItemStack.stackSize;
-				par1ItemStack.stackSize = this
-						.storePartialItemStack(par1ItemStack);
-			} while (par1ItemStack.stackSize > 0
-					&& par1ItemStack.stackSize < var2);
+            else {
+                return false;
+            }
+        } else {
+            do {
+                var2 = par1ItemStack.stackSize;
+                par1ItemStack.stackSize = this
+                        .storePartialItemStack(par1ItemStack);
+            } while (par1ItemStack.stackSize > 0
+                    && par1ItemStack.stackSize < var2);
 
 			/*
 			 * if (par1ItemStack.stackSize == var2 &&
 			 * this.player.capabilities.isCreativeMode) {
 			 * par1ItemStack.stackSize = 0; return true; }
 			 */
-			// else
-			// {
-			return par1ItemStack.stackSize < var2;
-			// }
-		}
-	}
+            // else
+            // {
+            return par1ItemStack.stackSize < var2;
+            // }
+        }
+    }
 
-	public ItemStack decrStackSize(int location, int stackSize) {
-		if (this.items[location] != null) {
-			ItemStack itemStack;
+    public ItemStack decrStackSize(int location, int stackSize) {
+        if (this.items[location] != null) {
+            ItemStack itemStack;
 
-			if (this.items[location].stackSize <= stackSize) {
-				itemStack = this.items[location];
-				this.items[location] = null;
-				return itemStack;
-			} else {
-				itemStack = this.items[location].splitStack(stackSize);
+            if (this.items[location].stackSize <= stackSize) {
+                itemStack = this.items[location];
+                this.items[location] = null;
+                return itemStack;
+            } else {
+                itemStack = this.items[location].splitStack(stackSize);
 
-				if (this.items[location].stackSize == 0) {
-					this.items[location] = null;
-				}
+                if (this.items[location].stackSize == 0) {
+                    this.items[location] = null;
+                }
 
-				return itemStack;
-			}
-		} else {
-			return null;
-		}
-	}
+                return itemStack;
+            }
+        } else {
+            return null;
+        }
+    }
 
-	public ItemStack getStackInSlotOnClosing(int location) {
-		if (this.items[location] != null) {
-			ItemStack itemStack = this.items[location];
-			this.items[location] = null;
-			return itemStack;
-		} else {
-			return null;
-		}
-	}
+    public ItemStack getStackInSlotOnClosing(int location) {
+        if (this.items[location] != null) {
+            ItemStack itemStack = this.items[location];
+            this.items[location] = null;
+            return itemStack;
+        } else {
+            return null;
+        }
+    }
 
-	public void setInventorySlotContents(int location, ItemStack itemStack) {
-		this.items[location] = itemStack;
-	}
+    public void setInventorySlotContents(int location, ItemStack itemStack) {
+        this.items[location] = itemStack;
+    }
 
-	public void writeToNBT(NBTTagCompound nbttagcompound) {
-		NBTTagList nbttaglist = new NBTTagList();
-		NBTTagCompound content;
+    public void writeToNBT(NBTTagCompound nbttagcompound) {
+        NBTTagList nbttaglist = new NBTTagList();
+        NBTTagCompound content;
 
-		for (int i = 0; i < this.items.length; i++) {
-			if (this.items[i] != null) {
-				content = new NBTTagCompound();
-				content.setByte("Slot", (byte) i);
-				this.items[i].writeToNBT(content);
-				nbttaglist.appendTag(content);
-			}
-		}
+        for (int i = 0; i < this.items.length; i++) {
+            if (this.items[i] != null) {
+                content = new NBTTagCompound();
+                content.setByte("Slot", (byte) i);
+                this.items[i].writeToNBT(content);
+                nbttaglist.appendTag(content);
+            }
+        }
 
-		nbttagcompound.setTag(this.name, nbttaglist);
-	}
+        nbttagcompound.setTag(this.name, nbttaglist);
+    }
 
-	public void readFromNBT(NBTTagCompound nbttagcompound) {
-		NBTTagList nbttaglist = nbttagcompound.getTagList(this.name);
+    public void readFromNBT(NBTTagCompound nbttagcompound) {
+        NBTTagList nbttaglist = nbttagcompound.getTagList(this.name, 10);// type 10 is compound
 
-		if (nbttaglist != null) {
-			NBTTagCompound content;
+        if (nbttaglist != null) {
+            NBTTagCompound content;
 
-			for (int i = 0; i < nbttaglist.tagCount(); i++) {
-				content = (NBTTagCompound) nbttaglist.tagAt(i);
-				int location = content.getByte("Slot") & 255;
-				ItemStack itemStack = ItemStack.loadItemStackFromNBT(content);
+            for (int i = 0; i < nbttaglist.tagCount(); i++) {
+                content = nbttaglist.getCompoundTagAt(i);
+                int location = content.getByte("Slot") & 255;
+                ItemStack itemStack = ItemStack.loadItemStackFromNBT(content);
 
-				if (itemStack != null) {
-					this.items[location] = itemStack;
-				}
-			}
-		}
-	}
+                if (itemStack != null) {
+                    this.items[location] = itemStack;
+                }
+            }
+        }
+    }
 
-	public int getSizeInventory() {
-		return this.items.length;
-	}
+    public int getSizeInventory() {
+        return this.items.length;
+    }
 
-	public ItemStack getStackInSlot(int location) {
-		return this.items[location];
-	}
+    public ItemStack getStackInSlot(int location) {
+        return this.items[location];
+    }
 
-	public String getInvName() {
-		return this.name;
-	}
+    public String getInvName() {
+        return this.name;
+    }
 
-	public int getInventoryStackLimit() {
-		return this.stackLimit;
-	}
+    public int getInventoryStackLimit() {
+        return this.stackLimit;
+    }
 
-	public boolean hasItemStack(ItemStack itemStack) {
-		for (int i = 0; i < this.items.length; i++) {
-			if (this.items[i] != null && this.items[i].isItemEqual(itemStack)) {
-				return true;
-			}
-		}
+    public boolean hasItemStack(ItemStack itemStack) {
+        for (int i = 0; i < this.items.length; i++) {
+            if (this.items[i] != null && this.items[i].isItemEqual(itemStack)) {
+                return true;
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	public void openChest() {}
+    public void openChest() {
+    }
 
-	public void closeChest() {}
+    public void closeChest() {
+    }
 
-	public void onInventoryChanged() {}
+    public void onInventoryChanged() {
+    }
 
-	/**
-	 * for custom name
-	 */
-	public boolean isInvNameLocalized() {
-		return false;
-	}
+    /**
+     * for custom name
+     */
+    public boolean isInvNameLocalized() {
+        return false;
+    }
 
-	/**
-	 * for hopper
-	 */
-	public boolean isItemValidForSlot(int i, ItemStack itemstack) {
-		return false;
-	}
+    /**
+     * for hopper
+     */
+    public boolean isItemValidForSlot(int i, ItemStack itemstack) {
+        return false;
+    }
+
 }
