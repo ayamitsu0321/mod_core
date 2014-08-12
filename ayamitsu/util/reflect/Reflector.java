@@ -1,14 +1,14 @@
 package ayamitsu.util.reflect;
 
+import cpw.mods.fml.relauncher.CoreModManager;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-import cpw.mods.fml.relauncher.CoreModManager;
-
 public final class Reflector {
 
-	private static final boolean renameTable = Boolean.parseBoolean(System.getProperty("renamed"));// -DisRenameTable
+	private static final boolean renameTable = Boolean.parseBoolean(System.getProperty("renamed"));// -Drenamed
 	private static final boolean deobfuscatedEnvironment;
 
 	private Reflector() {}

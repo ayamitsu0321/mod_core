@@ -1,12 +1,6 @@
 package ayamitsu.util.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map;

@@ -1,44 +1,19 @@
 package ayamitsu.util.asm;
 
-import java.io.BufferedOutputStream;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.List;
-//import java.util.logging.Logger;
-
+import cpw.mods.fml.common.FMLLog;
+import cpw.mods.fml.relauncher.FMLInjectionData;
+import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldInsnNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.FrameNode;
-import org.objectweb.asm.tree.IincInsnNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.LineNumberNode;
-import org.objectweb.asm.tree.LocalVariableNode;
-import org.objectweb.asm.tree.LookupSwitchInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.MultiANewArrayInsnNode;
-import org.objectweb.asm.tree.TableSwitchInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
+import org.objectweb.asm.tree.*;
 
-import cpw.mods.fml.common.FMLLog;
-import cpw.mods.fml.relauncher.FMLInjectionData;
-import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
+import java.io.*;
+import java.lang.reflect.Field;
+import java.util.List;
+
+//import java.util.logging.Logger;
 
 @TransformerExclusions("ayamitsu.util.asm")
 public final class ASMDebugUtils implements Opcodes {
@@ -47,15 +22,18 @@ public final class ASMDebugUtils implements Opcodes {
 	private static final Logger logger = LogManager.getLogger("ASMDebug");//Logger.getLogger("ASMDebug");
 
 	public static void info(String msg) {
-		logger.info(msg);
+		//logger.info(msg);
+        System.out.println(msg);
 	}
 
 	public static void log(String msg) {
-		logger.log(Level.ALL, msg);
+		//logger.log(Level.ALL, msg);
+        System.out.println(msg);
 	}
 
     public static void fine(String msg) {
-        logger.log(Level.DEBUG, msg);
+        //logger.log(Level.DEBUG, msg);
+        System.out.println(msg);
     }
 
 	public static void logAll(ClassNode cNode) {
@@ -68,7 +46,7 @@ public final class ASMDebugUtils implements Opcodes {
 				log(fNode);
 			}
 		} else {
-			logger.info("fields are null!");
+			info("fields are null!");
 		}
 
 		fine("field node log end");
@@ -95,7 +73,7 @@ public final class ASMDebugUtils implements Opcodes {
 				log(aiNode);
 			}
 		} else {
-			logger.info("method instructions are null!");
+			info("method instructions are null!");
 		}
 
 		fine("method instruction node log end");
